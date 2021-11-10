@@ -9,12 +9,12 @@ class CBSaccount:
 		
 		username = username
 		password = password
-		mailAdress = username + '@student.cbs.dk'
-		credentials = Credentials(mailAdress,
+		mailAddress = username + '@student.cbs.dk'
+		credentials = Credentials(mailAddress,
 		                          password)
 		config = Configuration(credentials = credentials,
 		                            server = 'outlook.office365.com')
-		self.account = Account(primary_smtp_address=mailAdress,
+		self.account = Account(primary_smtp_address=mailAddress,
 		                       access_type=DELEGATE,
 		                       autodiscover=False,
 		                       credentials=credentials,
