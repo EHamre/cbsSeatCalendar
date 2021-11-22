@@ -77,16 +77,16 @@ class CBSaccount:
 				hourEnd = int(timeEndString.split(sep=':')[0])
 				minuteEnd = int(timeEndString.split(sep=':')[1])
 				
-				startdt = dt.datetime(year=int(yearString),
-				                      month=int(monthString),
-				                      day=int(dayString),
-				                      hour=hourStart,
-				                      minute=minuteStart).replace(tzinfo = self.tz)
-				enddt = dt.datetime(year=int(yearString),
-				                    month=int(monthString),
-				                    day=int(dayString),
-				                    hour=hourEnd,
-				                    minute=minuteEnd).replace(tzinfo = self.tz)
+				startdt = dt.datetime(**{'year':int(yearString),
+				                         'month':int(monthString),
+				                         'day':int(dayString),
+				                         'hour':hourStart,
+				                         'minute':minuteStart}).replace(tzinfo = self.tz)
+				enddt = dt.datetime(**{'year':int(yearString),
+				                       'month':int(monthString),
+				                       'day':int(dayString),
+				                       'hour':hourEnd,
+				                       'minute':minuteEnd}).replace(tzinfo = self.tz)
 				
 				# if booking is in the past, go to next iteration
 				yesterday = today - dt.timedelta(days=1)
@@ -97,20 +97,21 @@ class CBSaccount:
 				endEWS = EWSDateTime.from_datetime(enddt)
 				
 				# skip duplicates
-				alreadyThere = self.account.calendar.filter(subject=seatString,
-				                                            start=startEWS,
-				                                            end=endEWS,
-				                                            location=seatRoomLocation).all().count() != 0
+				alreadyThere = self.account.calendar.filter(**{'subject':seatString,
+				                                               'start':startEWS,
+				                                               'end':endEWS,
+				                                               'location':seatRoomLocation}).all().count() != 0
+				sentThisWeek = mail.datetime_sent.isocalendar()[1] == mail.datetime_sent.today().isocalendar()[1]
 				
 				if alreadyThere:
 					if all([alreadyThere, cancellation]):
-						self.account.calendar.filter(subject=seatString,
-						                             start=startEWS,
-						                             end=endEWS,
-						                             location=seatRoomLocation)[0].delete()
+						self.account.calendar.filter(**{'subject':seatString,
+						                                'start':startEWS,
+						                                'end':endEWS,
+						                                'location':seatRoomLocation})[0].delete()
 						
 						# check if quota update is from this week
-						if mail.datetime_sent.isocalendar().week == mail.datetime_sent.today().isocalendar().week:
+						if sentThisWeek:
 							if groupRoom:
 								roomQuota = int(mail.body.splitlines()[13].strip().split()[2])
 								roomQuotaNext = int(mail.body.splitlines()[14].strip().split()[2])
@@ -134,7 +135,7 @@ class CBSaccount:
 					ev.save()
 					
 					# check if quota update is from this week
-					if mail.datetime_sent.isocalendar().week == mail.datetime_sent.today().isocalendar().week:
+					if sentThisWeek:
 						if groupRoom:
 							roomQuota = int(mail.body.splitlines()[12].strip().split()[2])
 							roomQuotaNext = int(mail.body.splitlines()[13].strip().split()[2])
