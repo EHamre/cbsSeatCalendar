@@ -123,7 +123,7 @@ class CBSaccount:
 						                f'Time: {startEWS.strftime("%H:%M")}-{endEWS.strftime("%H:%M")}.  '
 						                f'Date: {startEWS.strftime("%d/%m/%Y")}']
 						if updateString[0] in updatedBookings:
-							updatedBookings[updatedBookings.index(updateString[0])] = updateString[0] + '  (CANCELLED)'
+							updatedBookings.pop(updatedBookings.index(updateString[0]))
 						else:
 							updatedBookings.append(updateString[0] + '  (CANCELLED)')
 				else:
